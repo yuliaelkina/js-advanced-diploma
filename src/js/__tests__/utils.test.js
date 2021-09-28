@@ -1,6 +1,6 @@
-import { calcTileType } from "../utils";
+import { calcTileType } from '../utils';
 
-test ('получаем значения плиток для поля 6*6', () => {
+test('получаем значения плиток для поля 6*6', () => {
   expect(calcTileType(0, 6)).toBe('top-left');
   expect(calcTileType(1, 6)).toBe('top');
   expect(calcTileType(3, 6)).toBe('top');
@@ -14,4 +14,4 @@ test ('получаем значения плиток для поля 6*6', () =
   expect(calcTileType(30, 6)).toBe('bottom-left');
   expect(calcTileType(32, 6)).toBe('bottom');
   expect(calcTileType(35, 6)).toBe('bottom-right');
-})
+});

@@ -1,3 +1,5 @@
+/* eslint-disable no-plusplus */
+
 export function calcTileType(index, boardSize) {
   if (index === 0) {
     return 'top-left';
@@ -11,7 +13,7 @@ export function calcTileType(index, boardSize) {
   if (index === boardSize * (boardSize - 1)) {
     return 'bottom-left';
   }
-  if (index > 0 && index < boardSize -1) {
+  if (index > 0 && index < boardSize - 1) {
     return 'top';
   }
   if (index > boardSize * (boardSize - 1) && index < boardSize ** 2 - 1) {
