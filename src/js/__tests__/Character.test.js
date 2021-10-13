@@ -1,8 +1,9 @@
 import Character from '../Character';
-import characterTypesforComp from '../characterTypesForComp';
+import Team from '../Team';
 
 test('создание персонажа', () => {
-expect(new characterTypesforComp[0]).toBeDefined();
+  const team = new Team();
+  expect(new team.npcTeams[0]).toBeDefined();
 });
 
 test('выброс ошибки при попытке создать Character', () => {
