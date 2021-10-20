@@ -1,3 +1,4 @@
+/* eslint new-parens: 0 */
 import Character from '../Character';
 import Team from '../Team';
 

@@ -6,4 +6,4 @@ export default class Vampire extends Character {
     this.attack = 25;
     this.defence = 25;
   }
-};
+}

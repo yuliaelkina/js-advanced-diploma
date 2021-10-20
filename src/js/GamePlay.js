@@ -1,3 +1,5 @@
+/* eslint arrow-parens: 0 */
+
 import { calcHealthLevel, calcTileType } from './utils';
 
 export default class GamePlay {
@@ -203,7 +205,7 @@ export default class GamePlay {
   hideCellTooltip(index) {
     this.cells[index].title = '';
   }
-  
+
   showDamage(index, damage) {
     return new Promise((resolve) => {
       const cell = this.cells[index];
