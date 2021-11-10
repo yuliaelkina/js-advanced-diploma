@@ -1,9 +1,8 @@
 export default class GameState {
-  constructor() {
-    this.turn = 'user';
-  }
+  
+  static turn = 'user';
 
-  changeTurn() {
+  static changeTurn() {
     if (this.turn === 'user') {
       this.turn = 'npc';
     } else {
