@@ -24,4 +24,8 @@ export default class Team {
       this.list.push(el);
     });
   }
+
+  clearTeam() {
+    this.list = [];
+  }
 }
