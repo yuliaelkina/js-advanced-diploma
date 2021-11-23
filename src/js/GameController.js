@@ -1,9 +1,16 @@
+/* eslint-disable no-alert */
+/* eslint-disable max-len */
+/* eslint-disable no-lonely-if */
+/* eslint-disable no-param-reassign */
+
 import themes from './themes';
 import Team from './Team';
 import GameState from './GameState';
 import GamePlay from './GamePlay';
 import cursors from './cursors';
-import avaiableMoves from './avaiableMoves';
+import {
+  MovesAndAttacksfor1Cell, Movesfor2Cells, Movesfor4Cells, Attackfor2Cells, Attackfor4Cells,
+} from './avaiableMoves';
 
 export default class GameController {
   constructor(gamePlay, stateService) {
@@ -73,7 +80,7 @@ export default class GameController {
   }
 
   onCellClick(index) {
-    if (GameState.turn === 'user') { 
+    if (GameState.turn === 'user') {
       if (this.selectedCharacter === undefined) {
         if (this.userTeam.list.find((el) => el.position === index) !== undefined) {
           this.gamePlay.selectCell(index);
@@ -82,16 +89,16 @@ export default class GameController {
           GamePlay.showError('Выберите своего персонажа');
         }
       } else {
-        if (this.userTeam.list.find((el) => el.position === index) !== undefined) { 
+        if (this.userTeam.list.find((el) => el.position === index) !== undefined) {
           this.gamePlay.deselectCell(this.selectedCharacter.position);
           this.gamePlay.selectCell(index);
           this.selectedCharacter = this.userTeam.list.find((el) => el.position === index);
         } else if (this.gamePlay.cells[index].classList.contains('selected-red')) {
           this.gamePlay.deselectCell(this.gamePlay.cells.findIndex((el) => el.classList.contains('selected-red')));
-          const victim = this.npcTeam.list.find((el) => el.position === index)
-          const damage = Math.max(this.selectedCharacter.character.attack - victim.character.defence, this.selectedCharacter.character.attack * 0.1)
+          const victim = this.npcTeam.list.find((el) => el.position === index);
+          const damage = Math.max(this.selectedCharacter.character.attack - victim.character.defence, this.selectedCharacter.character.attack * 0.1);
           this.gamePlay.showDamage(index, damage).then(() => {
-            victim.character.health = victim.character.health - damage;
+            victim.character.health -= damage;
             if (victim.character.health <= 0) {
               this.npcTeam.list.splice(this.npcTeam.list.indexOf(victim), 1);
             }
@@ -110,7 +117,7 @@ export default class GameController {
         } else {
           alert('действие невозможно');
         }
-      }  
+      }
     }
   }
 
@@ -129,12 +136,13 @@ export default class GameController {
       }
     }
   }
+
   onCellLeave(index) {
     if (GameState.turn === 'user') {
       this.gamePlay.hideCellTooltip(index);
       this.gamePlay.setCursor(cursors.auto);
       if (this.selectedCharacter !== undefined && index !== this.selectedCharacter.position) {
-      this.gamePlay.deselectCell(index);
+        this.gamePlay.deselectCell(index);
       }
     }
   }
@@ -147,15 +155,15 @@ export default class GameController {
     let avaiableMoving;
     let avaiableAttack;
     if (typeOfCharacter === 'magician') {
-      avaiableMoving = this.possibleMoves('magician', selectedIndex);
-      avaiableAttack = this.possibleAttack('magician', selectedIndex);
+      avaiableMoving = GameController.possibleMoves('magician', selectedIndex);
+      avaiableAttack = GameController.possibleAttack('magician', selectedIndex);
     } else if (typeOfCharacter === 'bowman') {
-      avaiableMoving = this.possibleMoves('bowman', selectedIndex);
-      avaiableAttack = this.possibleAttack('bowman', selectedIndex);
+      avaiableMoving = GameController.possibleMoves('bowman', selectedIndex);
+      avaiableAttack = GameController.possibleAttack('bowman', selectedIndex);
     } else if (typeOfCharacter === 'swordsman') {
-      avaiableMoving = this.possibleMoves('swordsman', selectedIndex);
-      avaiableAttack = this.possibleAttack('swordsman', selectedIndex);
-    };
+      avaiableMoving = GameController.possibleMoves('swordsman', selectedIndex);
+      avaiableAttack = GameController.possibleAttack('swordsman', selectedIndex);
+    }
     if (this.userTeam.list.find((el) => el.position === index)) {
       this.gamePlay.setCursor(cursors.pointer);
     } else if (avaiableAttack.includes(index) && this.npcTeam.list.find((el) => el.position === index)) {
@@ -170,8 +178,8 @@ export default class GameController {
       this.gamePlay.setCursor(cursors.pointer);
       this.gamePlay.selectCell(index, 'green');
     } else {
-    this.gamePlay.setCursor(cursors.notallowed);
-    };
+      this.gamePlay.setCursor(cursors.notallowed);
+    }
   }
 
   changeTurn() {
@@ -179,14 +187,14 @@ export default class GameController {
       this.totalCounting();
       this.gameOver();
       return;
-    } 
+    }
     if (this.npcTeam.list.length === 0) {
       this.totalCounting();
       if (GameState.level === 4) {
         this.gameOver();
       } else {
         this.newLevel();
-      };
+      }
       return;
     }
     if (GameState.turn === 'user') {
@@ -196,19 +204,18 @@ export default class GameController {
       GameState.turn = 'user';
     }
   }
+
   npcTurn() {
-    if(GameState.turn === 'npc') {
+    if (GameState.turn === 'npc') {
       const attackVars = [];
       this.npcTeam.list.forEach((el) => {
-        const type = el.character.type;
-        const index = el.position;
-        const avaiableAttackforNpc = this.possibleAttack(type, index);
-        if (this.userTeam.list.find((el) => avaiableAttackforNpc.includes(el.position)) !== undefined) {
+        const avaiableAttackforNpc = GameController.possibleAttack(el.character.type, el.position);
+        if (this.userTeam.list.find((item) => avaiableAttackforNpc.includes(item.position)) !== undefined) {
           const attackPair = [];
-          attackPair.push(this.userTeam.list.find((el) => avaiableAttackforNpc.includes(el.position)));
+          attackPair.push(this.userTeam.list.find((item) => avaiableAttackforNpc.includes(item.position)));
           attackPair.push(el);
           attackVars.push(attackPair);
-        };
+        }
       });
       if (attackVars.length > 0) {
         const rand = attackVars[Math.floor(Math.random() * attackVars.length)];
@@ -216,7 +223,7 @@ export default class GameController {
         const attacker = this.npcTeam.list.find((el) => el.position === rand[1].position);
         const damage = Math.max(attacker.character.attack - victim.character.defence, attacker.character.attack * 0.1);
         this.gamePlay.showDamage(victim.position, damage).then(() => {
-          victim.character.health = victim.character.health - damage;
+          victim.character.health -= damage;
           if (victim.character.health <= 0) {
             this.userTeam.list.splice(this.userTeam.list.indexOf(victim), 1);
           }
@@ -225,46 +232,51 @@ export default class GameController {
         });
       } else {
         const attacker = this.npcTeam.list[Math.floor(Math.random() * this.npcTeam.list.length)];
-        const movesVars = this.possibleMoves(attacker.character.type, attacker.position);
+        const movesVars = GameController.possibleMoves(attacker.character.type, attacker.position);
         const rand = Math.floor(Math.random() * movesVars.length);
         attacker.position = movesVars[rand];
         this.gamePlay.redrawPositions(this.getFullTeam());
         this.changeTurn();
       }
-      
     }
   }
 
-  possibleMoves(typeOfCharacter, index) {
+  static possibleMoves(typeOfCharacter, index) {
+    let avaiable;
     if (typeOfCharacter === 'magician' || typeOfCharacter === 'daemon') {
-      return avaiableMoves.avaiableMovesAndAttacksfor1Cell[index];
+      avaiable = MovesAndAttacksfor1Cell[index];
     } else if (typeOfCharacter === 'bowman' || typeOfCharacter === 'vampire') {
-      return avaiableMoves.avaiableMovesfor2Cells[index];
+      avaiable = Movesfor2Cells[index];
     } else if (typeOfCharacter === 'swordsman' || typeOfCharacter === 'undead') {
-      return avaiableMoves.avaiableMovesfor4Cells[index];
+      avaiable = Movesfor4Cells[index];
     }
+    return avaiable;
   }
 
-  possibleAttack(typeOfCharacter, index) {
+  static possibleAttack(typeOfCharacter, index) {
+    let avaiable;
     if (typeOfCharacter === 'magician' || typeOfCharacter === 'daemon') {
-      return avaiableMoves.avaiableAttackfor4Cells[index];
+      avaiable = Attackfor4Cells[index];
     } else if (typeOfCharacter === 'bowman' || typeOfCharacter === 'vampire') {
-      return avaiableMoves.avaiableAttackfor2Cells[index];
+      avaiable = Attackfor2Cells[index];
     } else if (typeOfCharacter === 'swordsman' || typeOfCharacter === 'undead') {
-      return avaiableMoves.avaiableMovesAndAttacksfor1Cell[index];
+      avaiable = MovesAndAttacksfor1Cell[index];
     }
+    return avaiable;
   }
 
   totalCounting() {
     let points;
-    this.userTeam.list.forEach((el) => points =+ el.character.health);
+    this.userTeam.list.forEach((el) => {
+      points += el.character.health;
+    });
     GameState.totalScore += points;
   }
 
   gameOver() {
     if (GameState.totalScore > GameState.maxScore) {
       GameState.maxScore = GameState.totalScore;
-    };
+    }
     const block = document.createElement('div');
     block.classList.add('overlay');
     document.querySelector('.board-container').appendChild(block);
@@ -272,11 +284,11 @@ export default class GameController {
   }
 
   newLevel() {
-    GameState.level +=1;
+    GameState.level += 1;
     let theme;
     this.userTeam.list.forEach((el) => {
       el.character.level += 1;
-      const attackAfter = Math.max(el.character.attack, el.character.attack * (1.8 - el.character.health / 100) / 100);
+      const attackAfter = Math.max(el.character.attack, (el.character.attack * (1.8 - el.character.health / 100)) / 100);
       const healthAfter = el.character.health + 80;
       el.character.attack = attackAfter;
       if (healthAfter <= 100) {
